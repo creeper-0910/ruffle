@@ -181,13 +181,13 @@ impl<'gc> TInteractiveObject<'gc> for LoaderDisplay<'gc> {
         require_button_mode: bool,
     ) -> Option<InteractiveObject<'gc>> {
         // Don't do anything if run in an AVM2 context.
-        if self.as_displayobject().movie().is_action_script_3() {
+        if context.swf.is_action_script_3() {
             return None;
         }
 
         for child in self.iter_render_list().rev() {
             if let Some(int) = child.as_interactive() {
-                if int.as_displayobject().movie().is_action_script_3() {
+                if context.swf.is_action_script_3() {
                     let avm2_result = int.mouse_pick_avm2(context, point, require_button_mode);
                     if let Avm2MousePick::Hit(result) = avm2_result {
                         return Some(result);
@@ -210,7 +210,7 @@ impl<'gc> TInteractiveObject<'gc> for LoaderDisplay<'gc> {
         require_button_mode: bool,
     ) -> Avm2MousePick<'gc> {
         // Don't do anything if run in an AVM1 context.
-        if !self.as_displayobject().movie().is_action_script_3() {
+        if !context.swf.is_action_script_3() {
             return Avm2MousePick::Miss;
         }
 
@@ -220,7 +220,7 @@ impl<'gc> TInteractiveObject<'gc> for LoaderDisplay<'gc> {
         // We have at most one child
         if let Some(child) = self.iter_render_list().next() {
             if let Some(int) = child.as_interactive() {
-                if int.as_displayobject().movie().is_action_script_3() {
+                if context.swf.is_action_script_3() {
                     let res = int
                         .mouse_pick_avm2(context, point, require_button_mode)
                         .combine_with_parent((*self).into());
